@@ -1,0 +1,6 @@
+version: '2'
+services:
+    finance-mariadb:
+        extends:
+            file: mariadb.yml
+            service: finance-mariadb

@@ -1,0 +1,13 @@
+version: '2'
+services:
+    finance-mariadb:
+        image: mariadb:10.1.17
+        # volumes:
+        #     - ~/volumes/mysql/:/var/lib/mysql/
+        environment:
+            - MYSQL_USER=root
+            - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+            - MYSQL_DATABASE=db_finance
+        ports:
+            - 3306:3306
+        command: mysqld --character-set-server=utf8 --lower_case_table_names=1 --skip-ssl
