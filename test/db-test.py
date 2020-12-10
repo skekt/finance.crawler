@@ -8,7 +8,7 @@ cursor.execute("SELECT VERSION();")
 result = cursor.fetchone()
 print("MariaDB version: {}".format(result))
 
-cursor.execute("SELECT count(*) from search_rank;")
+cursor.execute("SELECT count(*) from search_ranking;")
 result = cursor.fetchone()
 print("count of search_rank: {}".format(result))
 
