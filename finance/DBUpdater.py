@@ -7,6 +7,9 @@ class DBUpdater:
         self.conn = pymysql.connect(host='localhost', port=3306, db='db_finance', user='finance', password='pwforfinance', charset='utf8')
         self.codes = dict()
 
+    def __del__(self):
+        self.conn.close()
+
     def read_krx_code(self):
         """한국거래소 상장기업 목록"""
         url = 'http://kind.krx.co.kr/corpgeneral/corpList.do?method=download&searchType=13'
