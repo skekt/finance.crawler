@@ -2,11 +2,12 @@
 CREATE TABLE search_ranking
 (
     id           BIGINT AUTO_INCREMENT PRIMARY KEY,
+    group_id     INT      NOT NULL,
     ranking      TINYINT      NOT NULL,
     company      VARCHAR(255) NOT NULL,
     created_date DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE INDEX uix_created_date_company (created_date, company),
-    INDEX ix_company (company)
+    UNIQUE INDEX uix_group_id_company (group_id, company),
+    INDEX ix_created_date_company (created_date, company)
 );
 
 # 한국거래소 상장기업 정보

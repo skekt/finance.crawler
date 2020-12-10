@@ -2,6 +2,8 @@ import pandas as pd
 import pymysql
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
+from datetime import datetime
+from threading import Timer
 
 class SearchRankService:
     def __init__(self):
@@ -33,17 +35,30 @@ class SearchRankService:
             return pd.DataFrame({'ranking': search_rank, 'company': company})
 
     def setSearchRank(self):
+        tnow = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(f'[{tnow}] Search ranking update start.')
+
         rankData = self.getSearchRank()
 
         with self.conn.cursor() as curs:
+            curs.execute("select ifnull(max(group_id), 0) + 1 from search_ranking;")
+            group_id = curs.fetchone()
+            print(group_id)
+
             for idx in range(len(rankData)):
                 ranking = rankData.ranking.values[idx]
                 company = rankData.company.values[idx]
-                sql = f"INSERT INTO search_ranking (ranking, company) " \
-                      f"VALUES ('{ranking}', '{company}')"
+                sql = f"INSERT INTO search_ranking (group_id, ranking, company) " \
+                      f"VALUES ('{group_id}', '{ranking}', '{company}')"
                 curs.execute(sql)
 
             self.conn.commit()
+
+            tnow = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            print(f'[{tnow}] Search ranking update finish.')
+
+            t = Timer(10, self.setSearchRank)
+            t.start()
 
 if __name__ == '__main__':
     service = SearchRankService()
