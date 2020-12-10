@@ -10,4 +10,5 @@ services:
             - MYSQL_DATABASE=db_finance
         ports:
             - 3306:3306
-        command: mysqld --character-set-server=utf8 --lower_case_table_names=1 --skip-ssl
+        command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --init-connect='SET NAMES UTF8;' --lower_case_table_names=1 --skip-ssl
+
