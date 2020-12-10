@@ -36,14 +36,12 @@ class SearchRankService:
 
     def setSearchRank(self):
         tnow = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(f'[{tnow}] Search ranking update start.')
-
         rankData = self.getSearchRank()
 
         with self.conn.cursor() as curs:
             curs.execute("select ifnull(max(group_id), 0) + 1 from search_ranking;")
             group_id = curs.fetchone()[0]
-            print(group_id)
+            print(f'[{tnow}] Search ranking update start. (groupId: {group_id})')
 
             for idx in range(len(rankData)):
                 ranking = rankData.ranking.values[idx]
