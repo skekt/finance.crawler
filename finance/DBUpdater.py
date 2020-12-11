@@ -40,8 +40,8 @@ class DBUpdater:
                 for idx in range(len(krx)):
                     code = krx.code.values[idx]
                     company = krx.company.values[idx]
-                    sql = f"REPLACE INTO company_info (code, company, last" \
-                          f"_update) VALUES ('{code}', '{company}', '{today}')"
+                    sql = f"REPLACE INTO company_info (code, company, updated_at) " \
+                          f"VALUES ('{code}', '{company}', '{today}')"
                     curs.execute(sql)
                     self.codes[code] = company
                     print(sql)
