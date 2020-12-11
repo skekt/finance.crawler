@@ -9,8 +9,6 @@ class SearchRankService:
     def __init__(self):
         self.conn = pymysql.connect(host='localhost', port=3306, db='db_finance', user='finance',
                                     password='pwforfinance', charset='utf8')
-        self.codes = dict()
-
     def __del__(self):
         self.conn.close()
 
@@ -43,6 +41,11 @@ class SearchRankService:
             group_id = curs.fetchone()[0]
             print(f'[{tnow}] Search ranking update start. (groupId: {group_id})')
 
+            curs.execute(f'SELECT ranking, company from search_ranking where group_id = {group_id - 1};')
+            current_ranking = dict(map(reversed, curs.fetchall()))
+
+            print(current_ranking)
+
             for idx in range(len(rankData)):
                 ranking = rankData.ranking.values[idx]
                 company = rankData.company.values[idx]
@@ -55,8 +58,8 @@ class SearchRankService:
             tnow = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             print(f'[{tnow}] Search ranking update finish.')
 
-            t = Timer(10, self.setSearchRank)
-            t.start()
+            # t = Timer(60*5, self.setSearchRank)
+            # t.start()
 
 if __name__ == '__main__':
     service = SearchRankService()

@@ -30,7 +30,7 @@ class DBUpdater:
             self.codes[df['code'].values[idx]] = df['company'].values[idx]
 
         with self.conn.cursor() as curs:
-            sql = "select max(last_update) from company_info"
+            sql = "select max(updated_at) from company_info"
             curs.execute(sql)
             rs = curs.fetchone()
             today = datetime.today().strftime('%Y-%m-%d')
