@@ -34,7 +34,7 @@ class SearchRankService:
 
     def setSearchRank(self):
         tnow = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        rankData = self.getSearchRank()
+        ranking_data = self.getSearchRank()
 
         with self.conn.cursor() as curs:
             curs.execute("select ifnull(max(group_id), 0) + 1 from search_ranking;")
@@ -42,30 +42,30 @@ class SearchRankService:
             print(f'[{tnow}] Search ranking update start. (groupId: {group_id})')
 
             curs.execute(f'SELECT ranking, company from search_ranking where group_id = {group_id - 1};')
-            current_ranking = dict(map(reversed, curs.fetchall()))
+            ranking_asis = dict(map(reversed, curs.fetchall()))
 
-            print(current_ranking)
+            print(ranking_asis)
 
-            for idx in range(len(rankData)):
-                ranking = rankData.ranking.values[idx]
-                company = rankData.company.values[idx]
+            for idx in range(len(ranking_data)):
+                ranking = ranking_data.ranking.values[idx]
+                company = ranking_data.company.values[idx]
                 step = 0
 
-                if current_ranking.get(company):
-                    step = current_ranking.get(company) - ranking
-                    print(f'{company} before: {current_ranking.get(company)}, after: {ranking}, step: {step}')
+                if ranking_asis.get(company):
+                    step = ranking_asis.get(company) - ranking
+                    print(f'{ranking}. {company} (before ranking: {ranking_asis.get(company)}, step: {step})')
 
                 sql = f"INSERT INTO search_ranking (group_id, ranking, company, step) " \
                       f"VALUES ('{group_id}', '{ranking}', '{company}', '{step}')"
                 curs.execute(sql)
 
-            self.conn.commit()
+        self.conn.commit()
 
-            tnow = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            print(f'[{tnow}] Search ranking update finish.')
+        tnow = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(f'[{tnow}] Search ranking update finish.')
 
-            # t = Timer(60*5, self.setSearchRank)
-            # t.start()
+        t = Timer(60*5, self.setSearchRank)
+        # t.start()
 
 if __name__ == '__main__':
     service = SearchRankService()
