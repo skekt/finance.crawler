@@ -27,7 +27,7 @@ class SearchRankService:
                     no = n.find('td', class_='no')
                     link = n.find('a', class_='tltle')
 
-                    search_rank.append(no.get_text())
+                    search_rank.append(int(no.get_text()))
                     company.append(link.get_text())
 
             return pd.DataFrame({'ranking': search_rank, 'company': company})
@@ -49,8 +49,14 @@ class SearchRankService:
             for idx in range(len(rankData)):
                 ranking = rankData.ranking.values[idx]
                 company = rankData.company.values[idx]
-                sql = f"INSERT INTO search_ranking (group_id, ranking, company) " \
-                      f"VALUES ('{group_id}', '{ranking}', '{company}')"
+                step = 0
+
+                if current_ranking.get(company):
+                    step = current_ranking.get(company) - ranking
+                    print(f'{company} before: {current_ranking.get(company)}, after: {ranking}, step: {step}')
+
+                sql = f"INSERT INTO search_ranking (group_id, ranking, company, step) " \
+                      f"VALUES ('{group_id}', '{ranking}', '{company}', '{step}')"
                 curs.execute(sql)
 
             self.conn.commit()
