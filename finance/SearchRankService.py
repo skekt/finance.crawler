@@ -44,8 +44,6 @@ class SearchRankService:
             curs.execute(f'SELECT ranking, company from search_ranking where group_id = {group_id - 1};')
             ranking_asis = dict(map(reversed, curs.fetchall()))
 
-            print(ranking_asis)
-
             for idx in range(len(ranking_data)):
                 ranking = ranking_data.ranking.values[idx]
                 company = ranking_data.company.values[idx]
@@ -62,7 +60,7 @@ class SearchRankService:
         self.conn.commit()
 
         tnow = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(f'[{tnow}] Search ranking update finish.')
+        print(f'[{tnow}] Search ranking update finish.', flush=True)
 
         t = Timer(60*5, self.setSearchRank)
         # t.start()
