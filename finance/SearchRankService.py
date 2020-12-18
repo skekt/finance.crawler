@@ -4,11 +4,15 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 from datetime import datetime
 from threading import Timer
+from slacker import Slacker
 
 class SearchRankService:
     def __init__(self):
         self.conn = pymysql.connect(host='localhost', port=3306, db='db_finance', user='finance',
                                     password='pwforfinance', charset='utf8')
+
+        self.slack = Slacker('xoxb-1550934577952-1527246562034-zU9UVbkjV15KZQVF5hsWcFkO')
+
     def __del__(self):
         self.conn.close()
 
@@ -44,6 +48,10 @@ class SearchRankService:
             curs.execute(f'SELECT ranking, company from search_ranking where group_id = {group_id - 1};')
             ranking_asis = dict(map(reversed, curs.fetchall()))
 
+            # 급등 / 급락
+            rise_up_company = []
+            fall_down_company = []
+
             for idx in range(len(ranking_data)):
                 ranking = ranking_data.ranking.values[idx]
                 company = ranking_data.company.values[idx]
@@ -61,6 +69,16 @@ class SearchRankService:
 
         tnow = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print(f'[{tnow}] Search ranking update finish.', flush=True)
+
+        markdown_text = '''
+        This message is plain.
+        *This message is bold.*
+        `This message is code.`
+        _This message is italic._
+        ~This message is strike.~
+        '''
+
+        self.slack.chat.post_message(channel="#info", text=markdown_text)
 
         t = Timer(60*5, self.setSearchRank)
         # t.start()
