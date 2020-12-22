@@ -6,6 +6,7 @@ from datetime import datetime
 from threading import Timer
 from slacker import Slacker
 
+
 class SearchRankService:
     def __init__(self):
         self.conn = pymysql.connect(host='localhost', port=3306, db='db_finance', user='finance',
@@ -59,29 +60,43 @@ class SearchRankService:
 
                 if ranking_asis.get(company):
                     step = ranking_asis.get(company) - ranking
-                    print(f'{ranking}. {company} (before ranking: {ranking_asis.get(company)}, step: {step})')
+
+                print(f'{ranking}. {company} (before ranking: {ranking_asis.get(company)}, step: {step})')
 
                 sql = f"INSERT INTO search_ranking (group_id, ranking, company, step) " \
                       f"VALUES ('{group_id}', '{ranking}', '{company}', '{step}')"
                 curs.execute(sql)
+
+                if step > 3:
+                    rise_up_company.append(company)
+
+                if step < -3:
+                    fall_down_company.append(company)
 
         self.conn.commit()
 
         tnow = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print(f'[{tnow}] Search ranking update finish.', flush=True)
 
-        markdown_text = '''
-        This message is plain.
-        *This message is bold.*
-        `This message is code.`
-        _This message is italic._
-        ~This message is strike.~
-        '''
+        rise_up_text = '*급등*'
+        for i in rise_up_company:
+            rise_up_text += '`' + i + '`'
+            rise_up_text += ' '
 
-        self.slack.chat.post_message(channel="#info", text=markdown_text)
+        fall_down_text = '*급락*'
+        for i in fall_down_company:
+            fall_down_text += '`' + i + '`'
+            fall_down_text += ' '
 
-        t = Timer(60*5, self.setSearchRank)
+        if len(rise_up_company) > 0:
+            self.slack.chat.post_message(channel="#info", text=rise_up_text)
+
+        if len(fall_down_company) > 0:
+            self.slack.chat.post_message(channel="#info", text=fall_down_text)
+
+        t = Timer(60 * 5, self.setSearchRank)
         # t.start()
+
 
 if __name__ == '__main__':
     service = SearchRankService()
