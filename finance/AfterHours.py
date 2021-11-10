@@ -1,20 +1,24 @@
+import datetime
 import pymysql
 import requests
 from threading import Timer
 
 class AfterHours:
     def __init__(self):
-        print('Hello?')
-        self.conn = pymysql.connect(host='localhost', port=3306, db='db_finance', user='finance', password='pwforfinance', charset='utf8')
-
+        print('AfterHours init.')
     def __del__(self):
-        print('End')
-        self.conn.close()
+        print('AfterHours end.')
 
     def fire(self):
+        self.conn = pymysql.connect(host='localhost', port=3306, db='db_finance', user='finance', password='pwforfinance', charset='utf8')
+
+        print(f'Crawling Started at {datetime.datetime.now()}')
         self.setRankOfAfterHours('KOSPI')
         self.setRankOfAfterHours('KOSDAQ')
-        
+        print(f'Crawling Ended at {datetime.datetime.now()}')
+
+        self.conn.close()
+
         # Per 24H
         t = Timer(60 * 60 * 24, self.fire)
         t.start()        
